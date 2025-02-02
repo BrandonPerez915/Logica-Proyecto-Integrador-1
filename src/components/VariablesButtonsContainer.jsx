@@ -1,17 +1,17 @@
 /* eslint-disable react/prop-types */
 
-export const ButtonsContainer = ({ containerClass, buttonsText, updateText, disabled }) => {
+export const VariablesButtonsContainer = ({ containerClass, buttonsText, disabled, updateText}) => {
 
-  const disabledClass = disabled ? 'disabled' : ''
-
+  const disabledClass = disabled ? '' : 'disabled'
+  
   return (
     <div className={ containerClass }>
       {
         buttonsText.map((text, index) => (
           <button 
             key={ index } 
-            className={ `operation-button ${ text } ${ disabledClass }` }
-            onClick = { updateText }
+            className={ `variable-button ${ text } ${ disabledClass }` }
+            onClick={ updateText }
           >
             { text }
           </button>
