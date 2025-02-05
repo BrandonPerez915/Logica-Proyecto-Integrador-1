@@ -1,79 +1,20 @@
 import { ButtonsContainer } from "./components/ButtonsContainer"
 import { VariablesButtonsContainer } from "./components/VariablesButtonsContainer"
+import { Switch } from "./components/Switch"
+import { Button } from "./components/Button"
+import { DeleteButton } from "./components/DeleteButton"
+
+import { TOPBUTTONSTEXTS, RIGHTBUTTONSTEXTS } from './utils/constants.js'
+import { updateText, addVariable, deleteVariable } from "./utils/logic.js"
 
 import { useState } from 'react'
 
 function App() {
 
-  const TOPBUTTONSTEXTS = ['AC', 'C', '(', ')', '∧', '∨']
-  const RIGHTBUTTONSTEXTS = ['⇒', '⇔', '¬', '⊕', '⊻', '⊼']
-
   const [text, setText] = useState('')
   const [parenthesis, setParenthesis] = useState(0)
   const [operation, setOperation] = useState(true)
   const [variables, setVariables] = useState({})
-
-  const updateText = (e) => {
-    if(e.target.textContent === 'AC') {
-      setText('')
-      setOperation(true)
-      return
-    }
-
-    else if(e.target.textContent === 'C') {
-
-      if(text.slice(-1) === '(') {
-        setParenthesis(parenthesis - 1)
-        setText(text.slice(0,-1))
-      }
-
-      else if(text.slice(-1) === ')') {
-        setParenthesis(parenthesis + 1)
-        setText(text.slice(0,-1))
-      }
-
-      else {
-        setText(text.slice(0,-1))
-        setOperation(!operation)
-      }
-
-      return
-    }
-
-    else if(e.target.textContent === '(') {
-      setParenthesis(parenthesis + 1)
-    }
-
-    const addText = e.target.textContent
-    setText(text + addText)
-    
-    if(e.target.textContent === ')' || e.target.textContent === '(') {
-      return
-    }
-
-    else{
-      setOperation(!operation)
-    }
-  }
-
-  const addVariable = (e) => {
-    e.preventDefault()
-    const variableName = document.querySelector('.variable-name').value
-    const variableValue = document.querySelector('.variable-value').value
-
-    if(variableName in variables) {
-      return // Agregar mensaje de 'desea sobreescribir la variable'
-    }
-
-    setVariables({ ...variables, [variableName]: variableValue})
-  }
-
-  const deleteVariable = (e) => { 
-    const variableName = e.target.parentElement.textContent[0]
-    const newVariables = { ...variables }
-    delete newVariables[variableName]
-    setVariables(newVariables)
-  }
 
   return (
     <>
@@ -82,49 +23,58 @@ function App() {
       </header>
       <main className='main'>
         <section className='calculator-container'>
-          <div className='calculator-screen'>
-            { text }
-          </div>
+          <div className='calculator-screen'><span>{ text }</span></div>
           <div className='calculator-keys'>
             <ButtonsContainer 
               containerClass='top-keys'
               buttonsText={ TOPBUTTONSTEXTS }
-              updateText={ updateText }
+              updateText={ (e) => updateText(e, text, setText, operation, setOperation, parenthesis, setParenthesis) }
               disabled={ operation }
+              parenthesesCount={ parenthesis } 
             />
             <div className='variables-keys'>
               <VariablesButtonsContainer
                 containerClass='variables-buttons'
                 buttonsText={ Object.keys(variables) }
                 disabled={ operation }
-                updateText={ updateText }
+                updateText={ (e) => updateText(e, text, setText, operation, setOperation, parenthesis, setParenthesis) }
               />
             </div>
             <ButtonsContainer
               containerClass='right-keys'
               buttonsText={ RIGHTBUTTONSTEXTS }
-              updateText={ updateText }
-            />
+              updateText={ (e) => updateText(e, text, setText, operation, setOperation, parenthesis, setParenthesis) }
+              disabled={ operation }
+            >
+              <button className='operation-button ='>=</button>
+            </ButtonsContainer>
           </div>
         </section>
-        <section className='info-container'>
+        <div className='card'>
           <div className='input-output-container'>
-            <h3>Ingresar variable</h3>
+            <section className='selector-mode'>
+              <h3>Ingresar variable</h3>
+              <span className='mode-selector'>Modo texto<Switch/></span> 
+            </section>
             <form className='add-variable-section' name='variables'>
               <input 
                 type='text' 
-                className="variable-name" 
+                className="variable-name input" 
                 required 
                 minLength={ 1 }
                 maxLength={ 1 }
               />
-              <label htmlFor='variable-name'> : </label>
+              <span>:</span>
               <input 
                 type='text' 
-                className="variable-value" 
+                className="variable-value input" 
                 id='variable-name'
+                required
               />
-              <button type='submit' onClick={ addVariable }>Agregar</button>
+              <Button 
+                clickFunction={ (e) => addVariable(e, variables, setVariables) } 
+                color='green'>Agregar
+              </Button>
             </form>
             <h3>Variables</h3>
             <ul className='variables-list'>
@@ -133,7 +83,7 @@ function App() {
                   return (
                     <li key={ variable }>
                       { variable } : { value }
-                      <button onClick = { deleteVariable }> Eliminar </button>
+                      <DeleteButton clickFunction={ (e) => deleteVariable(e, variables, setVariables) }/>
                     </li>
                   )
                 })
@@ -150,7 +100,7 @@ function App() {
           <div className='table-container'>
 
           </div>
-        </section>
+        </div>
       </main>
       <footer className='footer'>
 
