@@ -7,6 +7,7 @@
   --light-green: #e8fcc2;
   --green: #b1cc74;
   --vanilla: #d4e09b;
+  --dark_vanilla: #d7bd80;
   --olive: #9cb380;
   --olive-50-opacity: #9cb38080;
   --white: #f5f5f5;
@@ -37,7 +38,6 @@ h3 {
 .header {
   width: 100dvw;
   height: 50px;
-  border: 1px solid black;
   flex-shrink: 0;
 }
 
@@ -62,7 +62,6 @@ h3 {
 .footer {
   width: 100dvw;
   height: 55px;
-  border: 1px solid black;
   flex-shrink: 0;
 }
 
@@ -71,7 +70,9 @@ h3 {
   min-width: 300px;
   width: 50%;
   height: 450px;
-  border: 1px solid black;
+  background-color: var(--gray);
+  border: 7px solid var(--blue-gray);
+  border-radius: 13px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -80,7 +81,11 @@ h3 {
 }
 
 .calculator-screen {
-  background-color: var(--blue-gray);
+  width: 80%;
+  height: 20%;
+  background-color: var(--vanilla);
+  border: 5px solid var(--olive);
+  border-radius: 20px;
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
@@ -92,17 +97,74 @@ h3 {
   margin: 20px;
 }
 
-.calculator-screen {
-  width: 80%;
-  height: 20%;
-  border: 1px solid black;
-}
-
 .calculator-keys {
   width: 80%;
   height: 65%;
-  border: 1px solid black;
   position: relative;
+}
+
+.top-keys {
+  width: 100%;
+  height: 20%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.right-keys {
+  width: 30%;
+  height: 80%;
+  position: absolute;
+  top: 20%;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.variables-keys {
+  width: 70%;
+  height: 80%;
+  position: absolute;
+  top: 20%;
+  left: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.variables-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 90%;
+}
+
+.operation-button, .variable-button {
+  border-radius: 8px;
+  background-color: var(--dark_vanilla);
+  color: var(--white);
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid var(--white);
+}
+
+.operation-button {
+  width: 40px;
+  height: 40px;
+}
+
+.variable-button {
+  width: 35px;
+  height: 45px;
+  flex-grow: 1;
+  flex-basis: 0; 
+  aspect-ratio: 1; 
 }
 
 .input-output-container {
@@ -135,49 +197,6 @@ h3 {
   gap: 10px;
 }
 
-.top-keys {
-  width: 100%;
-  height: 20%;
-  border: 1px solid black;
-  position: absolute;
-  top: 0;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
-.variables-keys {
-  width: 70%;
-  height: 80%;
-  border: 1px solid black;
-  position: absolute;
-  top: 20%;
-  left: 0;
-}
-
-.right-keys {
-  width: 30%;
-  height: 80%;
-  border: 1px solid black;
-  position: absolute;
-  top: 20%;
-  right: 0;
-}
-
-.operation-button {
-  width: 30px;
-  aspect-ratio: 1/1;
-  text-align: center;
-  cursor: pointer;
-}
-
-.right-keys {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
 .disabled {
   opacity: 0.6;
   pointer-events: none;
@@ -204,28 +223,6 @@ h3 {
   height: 15px;
   border-radius: 50%;
   background-color: var(--olive);
-}
-
-.variables-keys{
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.variables-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  width: 90%;
-}
-
-.variable-button {
-  width: 30px;
-  aspect-ratio: 1/1;
-  text-align: center;
-  cursor: pointer;
 }
 
 .selector-mode {
@@ -419,14 +416,13 @@ input:hover {
 }
 
 .tooltip {
-  --tooltip-color: rgb(41, 41, 41);
   position: absolute;
   top: -40px;
-  background-color: var(--tooltip-color);
+  background-color: var(--blue-gray);
   color: white;
   border-radius: 5px;
   font-size: 12px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   font-weight: 600;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.105);
   display: flex;
@@ -441,7 +437,7 @@ input:hover {
   height: 10px;
   transform: rotate(45deg);
   content: "";
-  background-color: var(--tooltip-color);
+  background-color: var(--blue-gray);
   bottom: -10%;
 }
 .delete-button:hover .tooltip {

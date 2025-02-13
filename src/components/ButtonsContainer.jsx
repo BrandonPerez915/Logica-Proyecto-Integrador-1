@@ -12,7 +12,7 @@ export const ButtonsContainer = ({ children, containerClass, buttonsText, update
             return (
               <button 
                 key={ index } 
-                className={ `variable-button ${ text } ${ parenthesesCount > 0 ? '':'disabled'}` }
+                className={ `operation-button ${ text } ${ parenthesesCount > 0 ? '':'disabled'}` }
                 onClick={ updateText }
               >
                 { text }

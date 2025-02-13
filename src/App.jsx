@@ -1,12 +1,15 @@
+// Componentes
 import { ButtonsContainer } from "./components/ButtonsContainer"
 import { VariablesButtonsContainer } from "./components/VariablesButtonsContainer"
 import { Switch } from "./components/Switch"
 import { Button } from "./components/Button"
 import { DeleteButton } from "./components/DeleteButton"
 
+// Constantes y funciones lógicas
 import { TOPBUTTONSTEXTS, RIGHTBUTTONSTEXTS } from './utils/constants.js'
 import { updateText, addVariable, deleteVariable } from "./utils/logic.js"
 
+// Funciones de estado
 import { useState } from 'react'
 
 function App() {
@@ -15,6 +18,36 @@ function App() {
   const [parenthesis, setParenthesis] = useState(0)
   const [operation, setOperation] = useState(true)
   const [variables, setVariables] = useState({})
+  
+
+  function evalExpression() {
+
+    const replaceConditionalsAndBiconditionals = (expr) => {
+      expr = expr.replace(/(\([^()]*\)|\w+)\s*⇔\s*(\([^()]*\)|\w+)/g, (match, p1, p2) => {
+        return `(~${p1}|${p2})&(~${p2}|${p1})`
+      })
+      expr = expr.replace(/(\([^()]*\)|\w+)\s*⇒\s*(\([^()]*\)|\w+)/g, (match, p1, p2) => {
+        return `~${p1}|${p2}`
+      })
+      return expr;
+    }
+
+    let userInput = text;
+
+    userInput = replaceConditionalsAndBiconditionals(userInput);
+
+    userInput = userInput.replace(/¬/g, '~')
+    userInput = userInput.replace(/∧/g, '&')
+    userInput = userInput.replace(/∨/g, '|')
+    userInput = userInput.replace(/⊕/g, '^')
+    
+    for(let i of Object.entries(variables)) {
+      userInput = userInput.replace(new RegExp(i[0], 'g'), i[1] === 'Verdadero' ? '1' : '0')
+    }
+
+    console.log(userInput)
+    console.log(eval(userInput))
+  }
 
   return (
     <>
@@ -46,7 +79,7 @@ function App() {
               updateText={ (e) => updateText(e, text, setText, operation, setOperation, parenthesis, setParenthesis) }
               disabled={ operation }
             >
-              <button className='operation-button ='>=</button>
+              <button className='operation-button =' onClick={ evalExpression }>=</button>
             </ButtonsContainer>
           </div>
         </section>

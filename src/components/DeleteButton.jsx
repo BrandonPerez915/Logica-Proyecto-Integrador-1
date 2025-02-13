@@ -26,7 +26,7 @@ export const DeleteButton = ({ clickFunction }) => {
         ></path>
         <path fill="#B5BAC1" d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
       </svg>
-      <span className="tooltip" onClick={ clickFunction }>Delete</span>
+      <span className="tooltip" onClick={ clickFunction }>Borrar</span>
     </button>
   )
 }
