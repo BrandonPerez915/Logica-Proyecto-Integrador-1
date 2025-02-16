@@ -1,93 +1,86 @@
 // Componentes
-import { ButtonsContainer } from "./components/ButtonsContainer"
-import { VariablesButtonsContainer } from "./components/VariablesButtonsContainer"
-import { Switch } from "./components/Switch"
-import { Button } from "./components/Button"
-import { DeleteButton } from "./components/DeleteButton"
+import { ButtonsContainer } from "./components/ButtonsContainer.jsx"
+import { VariablesButtonsContainer } from "./components/VariablesButtonsContainer.jsx"
+import { Switch } from "./components/Switch.jsx"
+import { Button } from "./components/Button.jsx"
+import { DeleteButton } from "./components/DeleteButton.jsx"
+import { Card } from "./components/Card.jsx"
 
 // Constantes y funciones lógicas
 import { TOPBUTTONSTEXTS, RIGHTBUTTONSTEXTS } from './utils/constants.js'
-import { updateText, addVariable, deleteVariable } from "./utils/logic.js"
+import { updateText, addVariable, addBooleanVariable, 
+  deleteVariable, convertExpression, generateTableHeaders, 
+  generateTableData } from "./utils/logic.js"
 
 // Funciones de estado
 import { useState } from 'react'
 
 function App() {
 
-  const [text, setText] = useState('')
+  const [input, setInput] = useState('')
   const [parenthesis, setParenthesis] = useState(0)
   const [operation, setOperation] = useState(true)
   const [variables, setVariables] = useState({})
-  
+  const [textMode, setTextMode] = useState(false)
+  const [showTitles, setShowTitles] = useState(false)
+  const [tableBody, setTableBody] = useState([])
 
-  function evalExpression() {
-
-    const replaceConditionalsAndBiconditionals = (expr) => {
-      expr = expr.replace(/(\([^()]*\)|\w+)\s*⇔\s*(\([^()]*\)|\w+)/g, (match, p1, p2) => {
-        return `(~${p1}|${p2})&(~${p2}|${p1})`
-      })
-      expr = expr.replace(/(\([^()]*\)|\w+)\s*⇒\s*(\([^()]*\)|\w+)/g, (match, p1, p2) => {
-        return `~${p1}|${p2}`
-      })
-      return expr;
-    }
-
-    let userInput = text;
-
-    userInput = replaceConditionalsAndBiconditionals(userInput);
-
-    userInput = userInput.replace(/¬/g, '~')
-    userInput = userInput.replace(/∧/g, '&')
-    userInput = userInput.replace(/∨/g, '|')
-    userInput = userInput.replace(/⊕/g, '^')
+  const handleEvaluation = () => {
+    const binaryExpression = convertExpression(input, variables)
+    document.querySelector('.user-input-text').textContent = input
+    document.querySelector('.user-output-text').textContent = 
+      eval(binaryExpression) === 1 || eval(binaryExpression) === true ? 'Verdadero' : 'Falso'
     
-    for(let i of Object.entries(variables)) {
-      userInput = userInput.replace(new RegExp(i[0], 'g'), i[1] === 'Verdadero' ? '1' : '0')
+    if(input) {
+      setShowTitles(true)
     }
 
-    console.log(userInput)
-    console.log(eval(userInput))
+    setTableBody(generateTableData(tableHeaders))
   }
+
+  const tableHeaders = generateTableHeaders(input, variables)
+  tableHeaders.push(input)
 
   return (
     <>
       <header className='header'>
-
       </header>
       <main className='main'>
         <section className='calculator-container'>
-          <div className='calculator-screen'><span>{ text }</span></div>
-          <div className='calculator-keys'>
-            <ButtonsContainer 
-              containerClass='top-keys'
-              buttonsText={ TOPBUTTONSTEXTS }
-              updateText={ (e) => updateText(e, text, setText, operation, setOperation, parenthesis, setParenthesis) }
-              disabled={ operation }
-              parenthesesCount={ parenthesis } 
-            />
-            <div className='variables-keys'>
-              <VariablesButtonsContainer
-                containerClass='variables-buttons'
-                buttonsText={ Object.keys(variables) }
+          <div className='calculator-div'>
+            <div className='calculator-screen'><span>{ input }</span></div>
+            <div className='calculator-keys'>
+              <ButtonsContainer 
+                containerClass='top-keys'
+                buttonsText={ TOPBUTTONSTEXTS }
+                updateText={ (e) => updateText(e, input, setInput, operation, setOperation, parenthesis, setParenthesis, setShowTitles, setTableBody) }
                 disabled={ operation }
-                updateText={ (e) => updateText(e, text, setText, operation, setOperation, parenthesis, setParenthesis) }
+                parenthesesCount={ parenthesis } 
               />
+              <div className='variables-keys'>
+                <VariablesButtonsContainer
+                  containerClass='variables-buttons'
+                  buttonsText={ Object.keys(variables) }
+                  disabled={ operation }
+                  updateText={ (e) => updateText(e, input, setInput, operation, setOperation, parenthesis, setParenthesis) }
+                />
+              </div>
+              <ButtonsContainer
+                containerClass='right-keys'
+                buttonsText={ RIGHTBUTTONSTEXTS }
+                updateText={ (e) => updateText(e, input, setInput, operation, setOperation, parenthesis, setParenthesis) }
+                disabled={ operation }
+              >
+                <button className='operation-button =' onClick={ handleEvaluation }>=</button>
+              </ButtonsContainer>
             </div>
-            <ButtonsContainer
-              containerClass='right-keys'
-              buttonsText={ RIGHTBUTTONSTEXTS }
-              updateText={ (e) => updateText(e, text, setText, operation, setOperation, parenthesis, setParenthesis) }
-              disabled={ operation }
-            >
-              <button className='operation-button =' onClick={ evalExpression }>=</button>
-            </ButtonsContainer>
           </div>
         </section>
-        <div className='card'>
+        <Card>
           <div className='input-output-container'>
             <section className='selector-mode'>
               <h3>Ingresar variable</h3>
-              <span className='mode-selector'>Modo texto<Switch/></span> 
+              <span className='mode-selector'>Modo texto<Switch changeFunction={ () => setTextMode(!textMode) }/></span> 
             </section>
             <form className='add-variable-section' name='variables'>
               <input 
@@ -98,16 +91,30 @@ function App() {
                 maxLength={ 1 }
               />
               <span>:</span>
-              <input 
-                type='text' 
-                className="variable-value input" 
-                id='variable-name'
-                required
-              />
-              <Button 
-                clickFunction={ (e) => addVariable(e, variables, setVariables) } 
-                color='green'>Agregar
-              </Button>
+              { textMode ?
+                <>
+                  <input 
+                    type='text' 
+                    className="variable-value input" 
+                    id='variable-name'
+                    required
+                  />
+                  <Button 
+                    clickFunction={ (e) => addVariable(e, variables, setVariables) } 
+                    color='green'>Agregar
+                  </Button>
+                </> :
+                <>
+                <Button 
+                  clickFunction={ (e) => addBooleanVariable(e, variables, setVariables, 'Verdadero') } 
+                  color='green'>Verdadero
+                </Button>
+                <Button 
+                  clickFunction={ (e) => addBooleanVariable(e, variables, setVariables, 'Falso') } 
+                  color='red'>Falso
+                </Button>
+              </>
+              }
             </form>
             <h3>Variables</h3>
             <ul className='variables-list'>
@@ -122,18 +129,53 @@ function App() {
                 })
               }
             </ul>
-            <h3>Input</h3>
-            <p className='user-input-text'></p>
-            <h3>Output</h3>
-            <p className='user-output-text'></p>
-            <h3>Tablas de la verdad</h3>
-            <table className='true-tables'>
+            <h3 className={ !showTitles ? 'hide' : ''}>Input</h3>
+            <p 
+              className={ !showTitles ? 'user-input-text hide' : 'user-input-text' }>
+            </p>
+            <h3 className={ !showTitles ? 'hide' : ''}>Output</h3>
+            <p 
+              className={ !showTitles ? 'user-output-text hide' : 'user-output-text' }>
+            </p>
+            <h3 className={ !showTitles ? 'hide' : ''}>
+              { !textMode ? 'Tablas de verdad' : '' }
+            </h3>
+            <table className={ !showTitles ? 'true-tables hide' : 'true-tables' }>
+              <thead>
+                <tr>
+                  {
+                    tableHeaders.map((expression, index) => {
+                      return (
+                        <th key={ index } className='table-header'>
+                          { expression }
+                        </th>
+                      )
+                    })
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  tableBody.map((currentRow, index) => {
+                    return (
+                      <tr key={ index }>
+                        {
+                          currentRow.map((currentColumn, index) => {
+                            return (
+                              <td key={ index }>
+                                { currentColumn }
+                              </td>
+                            )
+                          })
+                        }
+                      </tr>
+                    )
+                  })
+                }
+              </tbody>
             </table>
           </div>
-          <div className='table-container'>
-
-          </div>
-        </div>
+        </Card>
       </main>
       <footer className='footer'>
 
