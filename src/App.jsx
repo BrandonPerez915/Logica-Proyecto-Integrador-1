@@ -10,7 +10,7 @@ import { Card } from "./components/Card.jsx"
 import { TOPBUTTONSTEXTS, RIGHTBUTTONSTEXTS } from './utils/constants.js'
 import { updateText, addVariable, addBooleanVariable, 
   deleteVariable, convertExpression, generateTableHeaders, 
-  generateTableData } from "./utils/logic.js"
+  generateTableData, replaceWithText } from "./utils/logic.js"
 
 // Funciones de estado
 import { useState } from 'react'
@@ -25,7 +25,7 @@ function App() {
   const [showTitles, setShowTitles] = useState(false)
   const [tableBody, setTableBody] = useState([])
 
-  const handleEvaluation = () => {
+  const handleBinaryEvaluation = () => {
     const binaryExpression = convertExpression(input, variables)
     document.querySelector('.user-input-text').textContent = input
     document.querySelector('.user-output-text').textContent = 
@@ -36,6 +36,13 @@ function App() {
     }
 
     setTableBody(generateTableData(tableHeaders))
+  }
+
+  const handleTextEvaluation = () => {
+    const convertedExpression = replaceWithText(input, variables)
+    document.querySelector('.user-input-text').textContent = input
+    document.querySelector('.user-output-text').textContent = convertedExpression
+    setShowTitles(true)
   }
 
   const tableHeaders = generateTableHeaders(input, variables)
@@ -71,7 +78,10 @@ function App() {
                 updateText={ (e) => updateText(e, input, setInput, operation, setOperation, parenthesis, setParenthesis) }
                 disabled={ operation }
               >
-                <button className='operation-button =' onClick={ handleEvaluation }>=</button>
+                <button 
+                  className='operation-button =' 
+                  onClick={ !textMode ? handleBinaryEvaluation : handleTextEvaluation }
+                >=</button>
               </ButtonsContainer>
             </div>
           </div>
@@ -80,7 +90,14 @@ function App() {
           <div className='input-output-container'>
             <section className='selector-mode'>
               <h3>Ingresar variable</h3>
-              <span className='mode-selector'>Modo texto<Switch changeFunction={ () => setTextMode(!textMode) }/></span> 
+              <span className='mode-selector'>Modo texto<Switch changeFunction={ () => {
+                  setTextMode(!textMode)
+                  setVariables({})
+                  setInput('')
+                  setParenthesis(0)
+                  setOperation(true)
+                  setShowTitles(false)
+                  setTableBody([])} }/></span> 
             </section>
             <form className='add-variable-section' name='variables'>
               <input 
@@ -140,7 +157,7 @@ function App() {
             <h3 className={ !showTitles ? 'hide' : ''}>
               { !textMode ? 'Tablas de verdad' : '' }
             </h3>
-            <table className={ !showTitles ? 'true-tables hide' : 'true-tables' }>
+            <table className={ textMode || !showTitles ? 'true-tables hide' : 'true-tables' }>
               <thead>
                 <tr>
                   {
@@ -162,7 +179,7 @@ function App() {
                         {
                           currentRow.map((currentColumn, index) => {
                             return (
-                              <td key={ index }>
+                              <td key={ index } className={ currentColumn === 'V' ? 'green-cell' : 'orange-cell' }>
                                 { currentColumn }
                               </td>
                             )

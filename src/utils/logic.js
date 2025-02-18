@@ -116,6 +116,40 @@ export function convertExpression(text, variables) {
   return userInput
 }
 
+export function replaceWithText(input, variables) {
+  let replacedInput = input
+
+  replacedInput = replacedInput.replace(/¬/g, ' no ')
+  replacedInput = replacedInput.replace(/∧/g, ' y ')
+  replacedInput = replacedInput.replace(/∨/g, ' o ')
+  replacedInput = replacedInput.replace(/⇔/g, ' si y solo si ')
+
+  const replaceConditionalsToText = (expression) => {
+    // Remplaza condicional por su equivalente en texto
+    expression = expression.replace(/(\([^()]*\)|\w+)\s*⇒\s*(\([^()]*\)|\w+)/g, (match, p1, p2) => {
+      return `si ${p1} entonces ${p2}`
+    })
+
+    // Remplaza XOR por su equivalente en texto
+    expression = expression.replace(/(\([^()]*\)|\w+)\s*⊕\s*(\([^()]*\)|\w+)/g, (match, p1, p2) => {
+      return `${p1} o ${p2} pero no ambos`
+    })
+
+    return expression
+  }
+
+  replacedInput = replaceConditionalsToText(replacedInput)
+
+  for(let [key, value] of Object.entries(variables)) {
+    replacedInput = replacedInput.replace(new RegExp(`\\b${key}\\b`, 'g'), value)
+  }
+
+  replacedInput = replacedInput.replace(/\(/g, '')
+  replacedInput = replacedInput.replace(/\)/g, '')
+
+  return replacedInput
+}
+
 export function addBooleanVariable(e, variables, setVariables, boolean) {
     e.preventDefault()
     const variableName = document.querySelector('.variable-name').value

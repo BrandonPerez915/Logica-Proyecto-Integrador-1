@@ -12,5 +12,5 @@ export const Switch = ({ changeFunction }) => {
         <span className="slider" />
       </label>
     </>
-  );
+  )
 }

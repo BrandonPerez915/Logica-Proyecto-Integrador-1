@@ -331,7 +331,7 @@ h3 {
  
 input:checked+.slider:before {
   transform: translateX(2em);
-  background: var(--aqua);
+  background: var(--green);
 }
 
 .input {
@@ -557,8 +557,31 @@ input:hover {
   letter-spacing: 0.1em;
 }
 
-.table-header {
-  border: 1px solid white;
+td {
+  border: 2px solid white;
   padding: 7px;
+  text-align: center;
+  font-weight: 1000;
 }
+
+th {
+  background-color: var(--blue-gray);
+  border: 2px solid white;
+  padding: 8px;
+}
+
+.green-cell {
+  background-color: var(--green);
+}
+
+.orange-cell {
+  background-color: var(--light-orange);
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 30px;
+}
+
  
