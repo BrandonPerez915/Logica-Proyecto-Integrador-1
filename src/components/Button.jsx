@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 
-export const Button = ({ children, clickFunction, color }) => {
+export const Button = ({ children, clickFunction, color, type='button' }) => {
   return (
-    <button 
+    <button
+      type={ type }
       className={`animated-button ${ color }`}  
       onClick={ clickFunction }>
       <span>{ children }</span>
